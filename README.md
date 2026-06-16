@@ -1,1 +1,1 @@
-# fightiq
+# FightIQ
