@@ -111,14 +111,25 @@ def get_or_create_fighter(name: str) -> str:
     key = name.strip().lower()
     if key in _cache:
         return _cache[key]
-    parts = name.strip().split(" ", 1)
+    parts   = name.strip().split(" ", 1)
+    first   = parts[0]
+    last    = parts[1] if len(parts) > 1 else ""
+
+    # Try to find existing fighter first
+    existing = db.table("fighters").select("fighter_id").eq(
+        "first_name", first).eq("last_name", last).execute()
+    if existing.data:
+        fid = existing.data[0]["fighter_id"]
+        _cache[key] = fid
+        return fid
+
+    # Create new fighter
     payload = {
         "fighter_id": str(uuid.uuid4()),
-        "first_name": parts[0],
-        "last_name":  parts[1] if len(parts) > 1 else "",
+        "first_name": first,
+        "last_name":  last,
     }
-    res = db.table("fighters").upsert(
-        payload, on_conflict="first_name,last_name").execute()
+    res = db.table("fighters").insert(payload).execute()
     fid = res.data[0]["fighter_id"]
     _cache[key] = fid
     return fid
