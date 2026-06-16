@@ -20,8 +20,8 @@ API_URL = os.environ.get("HF_SPACE_URL", "")
 def load_upcoming(driver):
     log.info("Scraping upcoming events from ufcstats...")
     prime_cache()
-    soup, driver = get_page(driver, f"{BASE}/statistics/events/upcoming",
-                             wait_class="b-statistics__table-row")
+    soup = get_page(driver, f"{BASE}/statistics/events/upcoming",
+                    wait_class="b-statistics__table-row")
     added = 0
     events = []
     for row in soup.select("tr.b-statistics__table-row"):
@@ -59,9 +59,9 @@ def settle_recent(driver):
         log.info("No pending events to settle")
         return driver
 
-    soup, driver = get_page(driver,
-                             f"{BASE}/statistics/events/completed?page=all",
-                             wait_class="b-statistics__table-row")
+    soup = get_page(driver,
+                    f"{BASE}/statistics/events/completed?page=all",
+                    wait_class="b-statistics__table-row")
     completed_map = {}
     for row in soup.select("tr.b-statistics__table-row"):
         a = row.select_one("a.b-link")
@@ -88,7 +88,7 @@ def trigger_predictions():
         return
     try:
         r = requests.post(f"{API_URL}/api/generate-predictions", timeout=120)
-        log.info(f"Predictions triggered: HTTP {r.status_code}")
+        log.info(f"Predictions triggered: HTTP {r.status_code} - {r.text}")
     except Exception as e:
         log.warning(f"Could not reach prediction API: {e}")
 
