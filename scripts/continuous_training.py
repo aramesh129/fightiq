@@ -1,5 +1,5 @@
 """
-FightIQ Continuous Training Pipeline
+FightIQ Training Pipeline
 Key improvements over the basic version:
   - Exponentially weighted rolling averages
   - Performance trajectory features
