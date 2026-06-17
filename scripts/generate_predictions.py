@@ -1,12 +1,8 @@
-import requests
-import os
+import requests, os
 from dotenv import load_dotenv
-
 load_dotenv()
-
-url = os.environ[https://aramesh129-fightiq-api.hf.space] + "/api/generate-predictions"
-print(f"Calling {url}...")
-
+url = os.environ.get('HF_SPACE_URL', 'https://aramesh129-fightiq-api.hf.space') + '/api/generate-predictions'
+print('Calling', url)
 r = requests.post(url, timeout=120)
-print(f"Status: {r.status_code}")
+print('Status:', r.status_code)
 print(r.text)
