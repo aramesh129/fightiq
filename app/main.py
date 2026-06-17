@@ -108,13 +108,7 @@ def model_stats():
 
 @app.post("/api/generate-predictions")
 def generate_predictions():
-    upcoming = db.table("bouts").select(
-        "bout_id, fighter_red_id, fighter_blue_id,"
-        "fighter_red:fighters!bouts_fighter_red_id_fkey(*),"
-        "fighter_blue:fighters!bouts_fighter_blue_id_fkey(*)"
-    ).eq("events.is_completed", False).is_("winner_id", "null").execute()
-
-    # Fallback — join manually
+    # Get all upcoming event IDs
     events = db.table("events").select("event_id").eq(
         "is_completed", False).execute().data
     event_ids = [e["event_id"] for e in events]
@@ -122,13 +116,14 @@ def generate_predictions():
     if not event_ids:
         return {"generated": 0, "reason": "no upcoming events"}
 
+    # Get all bouts for upcoming events
     all_bouts = []
     for eid in event_ids:
         res = db.table("bouts").select(
             "bout_id, fighter_red_id, fighter_blue_id,"
             "fighter_red:fighters!bouts_fighter_red_id_fkey(*),"
             "fighter_blue:fighters!bouts_fighter_blue_id_fkey(*)"
-        ).eq("event_id", eid).is_("winner_id", "null").execute()
+        ).eq("event_id", eid).execute()
         all_bouts.extend(res.data)
 
     # Skip bouts that already have predictions
