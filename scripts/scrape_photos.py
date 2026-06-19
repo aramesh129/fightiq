@@ -1,8 +1,3 @@
-"""
-Scrapes and re-hosts fighter photos to Supabase Storage.
-Processes all fighters missing photos, 50 at a time.
-Run manually to bulk-fill, then the weekly pipeline handles new fighters.
-"""
 import os, time, logging, requests
 from bs4 import BeautifulSoup
 from supabase import create_client
@@ -22,7 +17,7 @@ HEADERS = {
 def get_photo_url(first_name, last_name, ufc_id=None):
     slug = ufc_id or (
         f"{first_name}-{last_name}"
-        .lower().replace(" ", "-").replace("'", "").replace(".", "").replace(" ", "-")
+        .lower().replace(" ", "-").replace("'", "").replace(".", "")
     )
     try:
         page = requests.get(
@@ -54,7 +49,7 @@ def download_and_store(fighter_id, photo_url, slug):
     try:
         r = requests.get(photo_url, headers=HEADERS, timeout=15)
         if r.status_code != 200: return None
-        ct = r.headers.get("content-type", "image/jpeg")
+        ct  = r.headers.get("content-type", "image/jpeg")
         ext = "jpg" if "jpeg" in ct else ct.split("/")[-1].split(";")[0]
         path = f"{fighter_id}.{ext}"
         db.storage.from_("fighter-photos").upload(
@@ -66,24 +61,44 @@ def download_and_store(fighter_id, photo_url, slug):
         log.debug(f"Upload failed for {slug}: {e}")
         return None
 
+def get_all_missing():
+    """Paginate through all fighters missing photos."""
+    all_missing = []
+    page_size = 1000
+    offset = 0
+    while True:
+        res = db.table("fighters").select(
+            "fighter_id,first_name,last_name,ufc_id,wins,losses"
+        ).is_("photo_url", "null").range(offset, offset + page_size - 1).execute()
+        if not res.data:
+            break
+        all_missing.extend(res.data)
+        if len(res.data) < page_size:
+            break
+        offset += page_size
+    return all_missing
+
 def main():
-    # Check total missing
-    all_missing = db.table("fighters").select(
-        "fighter_id,first_name,last_name,ufc_id"
-    ).is_("photo_url", "null").execute().data
-    log.info(f"Fighters missing photos: {len(all_missing)}")
+    all_missing = get_all_missing()
+    log.info(f"Total fighters missing photos: {len(all_missing)}")
+
+    # Sort by most active fighters first (most wins + losses = most fights)
+    all_missing.sort(
+        key=lambda f: (f.get("wins") or 0) + (f.get("losses") or 0),
+        reverse=True
+    )
 
     updated = 0
-    failed = 0
+    failed  = 0
 
     for i, f in enumerate(all_missing, 1):
         fname = f["first_name"]
         lname = f["last_name"]
-        log.info(f"[{i}/{len(all_missing)}] {fname} {lname}")
+        total_fights = (f.get("wins") or 0) + (f.get("losses") or 0)
+        log.info(f"[{i}/{len(all_missing)}] {fname} {lname} ({total_fights} fights)")
 
         photo_src, slug = get_photo_url(fname, lname, f.get("ufc_id"))
         if not photo_src:
-            log.debug(f"  No photo found on UFC.com")
             failed += 1
             time.sleep(0.3)
             continue
@@ -92,14 +107,14 @@ def main():
         if public_url:
             db.table("fighters").update({
                 "photo_url": public_url,
-                "ufc_id": slug
+                "ufc_id":    slug
             }).eq("fighter_id", f["fighter_id"]).execute()
             updated += 1
             log.info(f"  Stored photo")
         else:
             failed += 1
 
-        time.sleep(0.4)  # polite rate limiting
+        time.sleep(0.4)
 
     log.info(f"Done! Updated={updated} Failed/NotFound={failed}")
 

@@ -108,32 +108,59 @@ def model_stats():
 
 @app.post("/api/generate-predictions")
 def generate_predictions():
-    upcoming = db.table("upcoming_card").select("*").execute().data
+    # Get all upcoming event IDs
+    events = db.table("events").select("event_id").eq(
+        "is_completed", False).execute().data
+    event_ids = [e["event_id"] for e in events]
+
+    if not event_ids:
+        return {"generated": 0, "reason": "no upcoming events"}
+
+    # Get all bouts for upcoming events
+    all_bouts = []
+    for eid in event_ids:
+        res = db.table("bouts").select(
+            "bout_id, fighter_red_id, fighter_blue_id,"
+            "fighter_red:fighters!bouts_fighter_red_id_fkey(*),"
+            "fighter_blue:fighters!bouts_fighter_blue_id_fkey(*)"
+        ).eq("event_id", eid).execute()
+        all_bouts.extend(res.data)
+
+    # Skip bouts that already have predictions
+    existing = {r["bout_id"] for r in
+                db.table("predictions").select("bout_id").execute().data}
+
     generated = 0
-    for bout in upcoming:
-        red = db.table("fighters").select("*").eq(
-            "fighter_id", bout["red_fighter_id"]).single().execute().data
-        blue = db.table("fighters").select("*").eq(
-            "fighter_id", bout["blue_fighter_id"]).single().execute().data
-        if not red or not blue: continue
+    for bout in all_bouts:
+        if bout["bout_id"] in existing:
+            continue
+        red  = bout["fighter_red"]
+        blue = bout["fighter_blue"]
+        if not red or not blue:
+            continue
         try:
             features = engineer_features(red, blue)
-            pred = predict(features)
-            mc   = simulate(bout["bout_id"], bout["red_fighter_id"],
-                            bout["blue_fighter_id"], pred["red_win_probability"])
+            pred     = predict(features)
+            mc       = simulate(bout["bout_id"], bout["fighter_red_id"],
+                                bout["fighter_blue_id"],
+                                pred["red_win_probability"])
             db.table("predictions").upsert({
-                "bout_id":                 bout["bout_id"],
-                "predicted_winner_id":     bout["red_fighter_id"] if pred["red_win_probability"] > 0.5
-                                           else bout["blue_fighter_id"],
-                "red_win_probability":     pred["red_win_probability"],
-                "blue_win_probability":    pred["blue_win_probability"],
-                "ko_probability":          mc["ko_probability"],
-                "submission_probability":  mc["submission_probability"],
-                "decision_probability":    mc["decision_probability"],
-                "shap_values":             pred["shap_values"],
-                "model_version":           "v20260615",
+                "bout_id":                bout["bout_id"],
+                "predicted_winner_id":    bout["fighter_red_id"]
+                                          if pred["red_win_probability"] > 0.5
+                                          else bout["fighter_blue_id"],
+                "red_win_probability":    pred["red_win_probability"],
+                "blue_win_probability":   pred["blue_win_probability"],
+                "ko_probability":         mc["ko_probability"],
+                "submission_probability": mc["submission_probability"],
+                "decision_probability":   mc["decision_probability"],
+                "shap_values":            pred["shap_values"],
+                "model_version":          "v20260615",
             }, on_conflict="bout_id").execute()
             generated += 1
         except Exception as e:
-            log.warning(f"Prediction failed for {bout['bout_id']}: {e}")
+            import traceback
+            log.warning(f"Prediction failed {bout['bout_id']}: {e}")
+            log.warning(traceback.format_exc())
+
     return {"generated": generated}
