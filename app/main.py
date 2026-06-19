@@ -159,6 +159,8 @@ def generate_predictions():
             }, on_conflict="bout_id").execute()
             generated += 1
         except Exception as e:
+            import traceback
             log.warning(f"Prediction failed {bout['bout_id']}: {e}")
+            log.warning(traceback.format_exc())
 
     return {"generated": generated}
