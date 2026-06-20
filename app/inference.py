@@ -43,7 +43,7 @@ def predict(features: list) -> dict:
         sv = shap_vals[1][0]
     else:
         sv = shap_vals[0] if shap_vals.ndim == 3 else shap_vals[0]
-    shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
+    shap_dict = {feature_names[i]: float(sv[0][i]) for i in range(len(feature_names))}
     return {
         "red_win_probability":  red_prob,
         "blue_win_probability": blue_prob,
