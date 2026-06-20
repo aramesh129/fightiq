@@ -38,10 +38,15 @@ def predict(features: list) -> dict:
     proba = model.predict_proba(X)[0]
     red_prob  = float(proba[1])
     blue_prob = float(proba[0])
-    sv = np.array(shap_vals)
+    raw = explainer.shap_values(X)
+    sv = np.array(raw)
     if sv.ndim == 3:
-        sv = sv[1][0]   # (classes, samples, features) -> positive class, first sample
+        sv = sv[1][0]
     elif sv.ndim == 2:
-        sv = sv[0]      # (samples, features) -> first sample
-    # sv is now 1D with length == n_features
+        sv = sv[0]
     shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
+    return {
+        "red_win_probability":  red_prob,
+        "blue_win_probability": blue_prob,
+        "shap_values":          shap_dict,
+    }
