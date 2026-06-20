@@ -32,7 +32,7 @@ def get_model():
         _load()
     return _model, _explainer, _feature_names
 
-def predict(features: list) -> dict:
+ddef predict(features: list) -> dict:
     model, explainer, feature_names = get_model()
     X = np.array([features])
     proba = model.predict_proba(X)[0]
@@ -42,8 +42,8 @@ def predict(features: list) -> dict:
     if isinstance(shap_vals, list):
         sv = shap_vals[1][0]
     else:
-        sv = shap_vals[0] if shap_vals.ndim == 3 else shap_vals[0]
-    shap_dict = {feature_names[i]: float(sv[1][i]) for i in range(len(feature_names))}
+        sv = shap_vals[1] if shap_vals.ndim == 3 else shap_vals[0]
+    shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
     return {
         "red_win_probability":  red_prob,
         "blue_win_probability": blue_prob,
