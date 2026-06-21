@@ -32,6 +32,8 @@ def get_model():
         _load()
     return _model, _explainer, _feature_names
 
+## fixed SHAP extraction
+
 def predict(features: list) -> dict:
     model, explainer, feature_names = get_model()
     X = np.array([features])
