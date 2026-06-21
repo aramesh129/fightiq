@@ -1,14 +1,1 @@
-<<<<<<< HEAD
----
-title: FightIQ API
-colorFrom: red
-colorTo: gray
-sdk: docker
-pinned: false
----
-
-# FightIQ API
-FastAPI backend for FightIQ UFC prediction engine.
-=======
 # FightIQ
->>>>>>> 09e9828016cdc463cf10a322b18ac697b7faab84
