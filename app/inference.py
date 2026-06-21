@@ -39,11 +39,11 @@ def predict(features: list) -> dict:
     red_prob  = float(proba[1])
     blue_prob = float(proba[0])
     raw = explainer.shap_values(X)
-    sv = np.array(raw)
-    if sv.ndim == 3:
-        sv = sv[1][0]
-    elif sv.ndim == 2:
-        sv = sv[0]
+    if isinstance(raw, list):
+        sv = raw[1][0]   # list of [class0, class1], take class1, first sample
+    else:
+        sv = np.array(raw)
+        sv = sv[0] if sv.ndim == 2 else sv
     shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
     return {
         "red_win_probability":  red_prob,
