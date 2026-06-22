@@ -1,1 +1,1 @@
-# FightIQ
+# FightIQ: UFC Fight Predictor
