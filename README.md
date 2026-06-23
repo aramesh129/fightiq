@@ -8,4 +8,4 @@ app_file: backend/backend/app/main.py
 pinned: false
 ---
 
-# FightIQ UFC FIGHT PREDICTOR
+# FightIQ: UFC Fight Predictor
