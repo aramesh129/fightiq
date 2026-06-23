@@ -1,11 +1,10 @@
 ---
-title: FightIQ
+title: FightIQ API
 emoji: 🥊
-colorFrom: blue
-colorTo: red
-sdk: python
-app_file: backend/backend/app/main.py
+colorFrom: red
+colorTo: gray
+sdk: docker
 pinned: false
 ---
 
-# FightIQ: UFC Fight Predictor
+# FightIQ
