@@ -1,0 +1,368 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 0 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.breadcrumb a {
+  color: #888;
+  transition: color 0.15s;
+}
+
+.breadcrumb a:hover { color: white; }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 200px 1fr;
+  min-height: 320px;
+  margin: 20px 0 32px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #222;
+}
+
+.heroSide {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.heroRed {
+  background: linear-gradient(135deg, #1e0505 0%, #111 100%);
+  border-right: 1px solid #222;
+}
+
+.heroBlue {
+  background: linear-gradient(225deg, #05071e 0%, #111 100%);
+  border-left: 1px solid #222;
+  flex-direction: row-reverse;
+}
+
+.heroWinner {
+  box-shadow: inset 0 0 0 2px rgba(0,200,80,0.3);
+}
+
+.heroPhoto {
+  width: 140px;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  border-right: 1px solid #1a1a1a;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.heroPhotoBlue {
+  border-right: none;
+  border-left: 1px solid #1a1a1a;
+}
+
+.heroImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.heroInitials {
+  font-size: 48px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.06);
+}
+
+.heroInfo {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.heroInfoRight {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.cornerTag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.cornerTagRed {
+  background: rgba(227,0,15,0.15);
+  color: #e3000f;
+  border: 1px solid rgba(227,0,15,0.25);
+}
+
+.cornerTagBlue {
+  background: rgba(26,111,196,0.15);
+  color: #4da3ff;
+  border: 1px solid rgba(26,111,196,0.25);
+}
+
+.heroName {
+  font-size: 26px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-top: 4px;
+}
+
+.heroProb {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  margin-top: 8px;
+  letter-spacing: -0.02em;
+}
+
+.heroProbLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.heroStats {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.heroStatsRight {
+  justify-content: flex-end;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.heroStatLabel {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* Center */
+.heroCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: #0f0f0f;
+  gap: 12px;
+}
+
+.heroVs {
+  font-size: 32px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.1);
+}
+
+.monteCarlo {
+  width: 100%;
+}
+
+.monteCarloTitle {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.monteCarloRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 4px 0;
+  color: #888;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.monteCarloRow:last-child { border-bottom: none; }
+
+.monteCarloRow span:last-child {
+  font-weight: 700;
+  color: white;
+}
+
+.probBar {
+  width: 100%;
+  height: 4px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.probBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e3000f var(--pct), #1a6fc4 var(--pct));
+}
+
+.result {
+  text-align: center;
+}
+
+.resultLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.resultMethod {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: white;
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e3000f;
+  display: inline-block;
+}
+
+.sectionSub {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+
+/* Stats table */
+.statsTable {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.statRow:last-child { border-bottom: none; }
+
+.statVal {
+  font-size: 16px;
+  font-weight: 800;
+  min-width: 30px;
+}
+
+.statCenter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.statBar {
+  width: 100%;
+  height: 3px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e3000f var(--pct), #1a6fc4 var(--pct));
+}
+
+/* SHAP */
+.shapList {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.shapRow {
+  display: grid;
+  grid-template-columns: 180px 1fr 60px;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.shapRow:last-child { border-bottom: none; }
+
+.shapKey {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: capitalize;
+}
+
+.shapBarWrap {
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+
+.shapBar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.shapVal {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
