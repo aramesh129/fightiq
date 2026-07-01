@@ -1,0 +1,113 @@
+.eventTabs {
+  display: flex;
+  gap: 4px;
+  padding: 24px 0 0;
+  border-bottom: 1px solid #222;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.eventTabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #555;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s;
+  background: none;
+  cursor: pointer;
+}
+
+.tab:hover { color: #aaa; }
+
+.tabActive {
+  color: white;
+  border-bottom-color: #e3000f;
+}
+
+.tabDate {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: #444;
+  margin-top: 2px;
+  text-transform: none;
+}
+
+.tabActive .tabDate { color: #888; }
+
+.eventHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.eventLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #e3000f;
+  margin-bottom: 8px;
+}
+
+.eventName {
+  font-size: 28px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.eventMeta {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
+}
+
+.countdown {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.countdownLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.countdownNum {
+  font-size: 56px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.fights {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.empty {
+  padding: 80px 0;
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

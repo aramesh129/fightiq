@@ -13,7 +13,7 @@
   height: 56px;
   display: flex;
   align-items: center;
-  position: relative;
+  gap: 48px;
 }
 
 .logo {
@@ -34,6 +34,7 @@
   font-weight: 900;
   font-size: 16px;
   color: white;
+  letter-spacing: -0.02em;
 }
 
 .logoText {
@@ -44,12 +45,10 @@
 }
 
 .links {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 1;
 }
 
 .link {
@@ -64,9 +63,13 @@
   position: relative;
 }
 
-.link:hover { color: #ccc; }
+.link:hover {
+  color: #ccc;
+}
 
-.active { color: white; }
+.active {
+  color: white;
+}
 
 .active::after {
   content: '';
