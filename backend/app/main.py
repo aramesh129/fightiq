@@ -97,7 +97,7 @@ def history(page: int = 1, limit: int = 20):
         "*,events(*),fighter_red:fighters!bouts_fighter_red_id_fkey(first_name,last_name,photo_url),"
         "fighter_blue:fighters!bouts_fighter_blue_id_fkey(first_name,last_name,photo_url),"
         "predictions(*)"
-    ).not_.is_("winner_id","null").order("created_at", desc=True).range(offset, offset+limit-1).execute()
+    ).not_.is_("winner_id","null").order("events.event_date", desc=True).range(offset, offset+limit-1).execute()
     return res.data
 
 @app.get("/api/stats")
