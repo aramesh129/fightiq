@@ -1,0 +1,60 @@
+name: Weekly Scrape + Retrain
+
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Every Monday at 10am UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  scrape-and-retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          cd scripts
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_MODEL_REPO: ${{ secrets.HF_MODEL_REPO }}
+          HF_SPACE_NAME: ${{ secrets.HF_SPACE_NAME }}
+          HF_SPACE_URL: ${{ secrets.HF_SPACE_URL }}
+        run: |
+          cd scripts
+          python scraper.py
+
+      - name: Run continuous training
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_MODEL_REPO: ${{ secrets.HF_MODEL_REPO }}
+          HF_SPACE_NAME: ${{ secrets.HF_SPACE_NAME }}
+          HF_SPACE_URL: ${{ secrets.HF_SPACE_URL }}
+        run: |
+          cd scripts
+          python continuous_training.py
+
+      - name: Generate predictions
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_MODEL_REPO: ${{ secrets.HF_MODEL_REPO }}
+          HF_SPACE_NAME: ${{ secrets.HF_SPACE_NAME }}
+          HF_SPACE_URL: ${{ secrets.HF_SPACE_URL }}
+        run: |
+          cd scripts
+          python generate_predictions.py
