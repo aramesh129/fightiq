@@ -25,7 +25,7 @@ AI UFC fight prediction platform built with a calibrated ensemble model, real-ti
 | Automation | GitHub Actions (weekly) |
 | Uptime | UptimeRobot |
 
----
+--
 
 ## Model
 
