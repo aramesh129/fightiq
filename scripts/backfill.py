@@ -28,6 +28,7 @@ def make_driver():
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
     from webdriver_manager.chrome import ChromeDriverManager
+    import os
 
     opts = Options()
     opts.add_argument("--headless")
@@ -36,10 +37,20 @@ def make_driver():
     opts.add_argument("--disable-gpu")
     opts.add_argument("--window-size=1920,1080")
 
-    service = Service(ChromeDriverManager().install())
+    # Fix for webdriver-manager returning wrong path
+    driver_path = ChromeDriverManager().install()
+    driver_dir = os.path.dirname(driver_path)
+    chromedriver = os.path.join(driver_dir, "chromedriver")
+    if not os.path.isfile(chromedriver):
+        # fallback: find chromedriver binary in the directory
+        for f in os.listdir(driver_dir):
+            if f == "chromedriver" or f.startswith("chromedriver") and not "." in f:
+                chromedriver = os.path.join(driver_dir, f)
+                break
+
+    service = Service(chromedriver)
     driver = webdriver.Chrome(service=service, options=opts)
     return driver
-
 
 def get_page(driver, url: str, wait_class: str = None,
              timeout: int = 15) -> BeautifulSoup:
