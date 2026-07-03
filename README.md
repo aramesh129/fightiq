@@ -4,7 +4,7 @@ AI UFC fight prediction platform built with a calibrated ensemble model, real-ti
 
 **Live site**: [fightiq-woad.vercel.app](https://fightiq-woad.vercel.app)
 
---
+
 
 ## What it does
 
@@ -12,7 +12,7 @@ AI UFC fight prediction platform built with a calibrated ensemble model, real-ti
 - Shows win probabilities, Monte Carlo outcome distributions, and SHAP feature attribution for every fight
 - Automatically scrapes new events, retrains the model, and generates predictions every week
 
---
+
 
 ## Stack
 
@@ -25,7 +25,7 @@ AI UFC fight prediction platform built with a calibrated ensemble model, real-ti
 | Automation | GitHub Actions (weekly) |
 | Uptime | UptimeRobot |
 
---
+
 
 ## Model
 
@@ -51,7 +51,7 @@ AI UFC fight prediction platform built with a calibrated ensemble model, real-ti
 
 **Explainability**: SHAP TreeExplainer on Random Forest base model
 
---
+
 
 ## Automation
 
