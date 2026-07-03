@@ -58,7 +58,6 @@ def settle_recent(driver):
     if not pending:
         log.info("No pending events to settle")
         return driver
-
     soup = get_page(driver,
                     f"{BASE}/statistics/events/completed?page=all",
                     wait_class="b-statistics__table-row")
@@ -67,7 +66,6 @@ def settle_recent(driver):
         a = row.select_one("a.b-link")
         if a and a.get("href"):
             completed_map[a.get_text(strip=True).lower()] = a["href"]
-
     settled = 0
     for ev in pending:
         url = completed_map.get(ev["event_name"].lower())

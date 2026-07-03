@@ -42,11 +42,14 @@ def predict(features: list) -> dict:
     blue_prob = float(proba[0])
     try:
         raw = explainer.shap_values(X)
-        if isinstance(raw, list):
-            sv = np.array(raw[1]).flatten()
-        else:
-            sv = np.array(raw).flatten()
-        sv = sv[-len(feature_names):]
+        sv = np.array(raw)
+        # Handle all possible shapes
+        if sv.ndim == 3:
+            sv = sv[1][0]   # (classes, samples, features)
+        elif sv.ndim == 2:
+            sv = sv[0]      # (samples, features)
+        # sv should now be 1D — force it
+        sv = np.array(sv).flatten()[-len(feature_names):]
         shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
     except Exception:
         shap_dict = {name: 0.0 for name in feature_names}

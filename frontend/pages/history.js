@@ -13,10 +13,10 @@ export default function History() {
 
   useEffect(() => {
     setLoading(true)
-    setHasMore(d.length === 500)
+    fetchHistory(page, 500)
       .then(d => {
         setData(prev => page === 1 ? d : [...prev, ...d])
-        setHasMore(d.length === 100)
+        setHasMore(d.length === 500)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
