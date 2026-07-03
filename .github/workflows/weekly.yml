@@ -64,4 +64,5 @@ jobs:
           HF_SPACE_URL: ${{ secrets.HF_SPACE_URL }}
         run: |
           cd scripts
+          sleep 60
           python generate_predictions.py
