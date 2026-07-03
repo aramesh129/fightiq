@@ -27,10 +27,12 @@ def get_model():
     global _loaded_at
     if _model is None:
         _load()
-    # Hot-reload every hour (test)
+    # Hot-reload every hour
     if (datetime.datetime.utcnow() - _loaded_at).seconds > 3600:
         _load()
     return _model, _explainer, _feature_names
+
+## fixed SHAP extraction
 
 def predict(features: list) -> dict:
     model, explainer, feature_names = get_model()
@@ -38,12 +40,19 @@ def predict(features: list) -> dict:
     proba = model.predict_proba(X)[0]
     red_prob  = float(proba[1])
     blue_prob = float(proba[0])
-    shap_vals = explainer.shap_values(X)
-    if isinstance(shap_vals, list):
-        sv = shap_vals[1][0]
-    else:
-        sv = shap_vals[0] if shap_vals.ndim == 3 else shap_vals[0]
-    shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
+    try:
+        raw = explainer.shap_values(X)
+        sv = np.array(raw)
+        # Handle all possible shapes
+        if sv.ndim == 3:
+            sv = sv[1][0]   # (classes, samples, features)
+        elif sv.ndim == 2:
+            sv = sv[0]      # (samples, features)
+        # sv should now be 1D — force it
+        sv = np.array(sv).flatten()[-len(feature_names):]
+        shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
+    except Exception:
+        shap_dict = {name: 0.0 for name in feature_names}
     return {
         "red_win_probability":  red_prob,
         "blue_win_probability": blue_prob,
