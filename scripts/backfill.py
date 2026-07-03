@@ -226,6 +226,7 @@ def scrape_event(driver, event_url: str, event_id: str) -> webdriver.Chrome:
         rnd = clean_int(cols[8].get_text()) if len(cols)>8 else None
         tme = cols[9].get_text(strip=True) if len(cols)>9 else None
 
+        # Delete dependent rows before upsert to avoid FK violations
         existing = db.table("bouts").select("bout_id").eq(
             "event_id", event_id).eq(
             "fighter_red_id", red_id).eq(
@@ -233,6 +234,7 @@ def scrape_event(driver, event_url: str, event_id: str) -> webdriver.Chrome:
         if existing.data:
             old_bout_id = existing.data[0]["bout_id"]
             db.table("predictions").delete().eq("bout_id", old_bout_id).execute()
+            db.table("fight_stats").delete().eq("bout_id", old_bout_id).execute()
 
         res = db.table("bouts").upsert({
             "bout_id":         str(uuid.uuid4()),
@@ -256,7 +258,6 @@ def scrape_event(driver, event_url: str, event_id: str) -> webdriver.Chrome:
                 driver, fight_link, actual_id, red_id, blue_id)
 
     return driver
-
 
 def get_all_events(driver, completed: bool) -> list:
     path = "completed?page=all" if completed else "upcoming"
