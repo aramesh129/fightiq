@@ -42,6 +42,14 @@ jobs:
           cd scripts
           python scraper.py
 
+        - name: Scrape fighter profiles
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          cd scripts
+          python scrape_fighter_profiles.py
+
       - name: Run continuous training
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
