@@ -1,4 +1,4 @@
-name: Weekly Scrape + Retrain
+name: Weekly Scrape & Retrain
 
 on:
   schedule:
