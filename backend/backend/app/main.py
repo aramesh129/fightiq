@@ -1,7 +1,6 @@
-import os, datetime, logging, time
+import os, datetime, logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from supabase import create_client
 from .database import db
 from .inference import predict, get_model
 from .monte_carlo import simulate
@@ -48,6 +47,7 @@ def engineer_features(red: dict, blue: dict) -> list:
         1.0 if blue.get("stance") == "Orthodox" else 0.0,
         1.0 if red.get("stance")  != blue.get("stance") else 0.0,
     ]
+    # Recent form placeholders (pipeline fills these; API uses career stats)
     recent = [0.0] * 8
     meta   = [0.0, 0.0,
               len([b for b in [] if True]) / max(1, (red.get("wins",0) or 0) + (red.get("losses",0) or 0)),
@@ -97,10 +97,8 @@ def history(page: int = 1, limit: int = 20):
         "*,events(*),fighter_red:fighters!bouts_fighter_red_id_fkey(first_name,last_name,photo_url),"
         "fighter_blue:fighters!bouts_fighter_blue_id_fkey(first_name,last_name,photo_url),"
         "predictions(*)"
-    ).not_.is_("winner_id","null").order("event_id", desc=True).range(offset, offset+limit-1).execute()
-    data = res.data
-    data.sort(key=lambda x: x.get("events", {}).get("event_date", "") if x.get("events") else "", reverse=True)
-    return data
+    ).not_.is_("winner_id","null").order("created_at", desc=True).range(offset, offset+limit-1).execute()
+    return res.data
 
 @app.get("/api/stats")
 def model_stats():
@@ -110,6 +108,7 @@ def model_stats():
 
 @app.post("/api/generate-predictions")
 def generate_predictions():
+    # Get all upcoming event IDs
     events = db.table("events").select("event_id").eq(
         "is_completed", False).execute().data
     event_ids = [e["event_id"] for e in events]
@@ -117,6 +116,7 @@ def generate_predictions():
     if not event_ids:
         return {"generated": 0, "reason": "no upcoming events"}
 
+    # Get all bouts for upcoming events
     all_bouts = []
     for eid in event_ids:
         res = db.table("bouts").select(
@@ -126,27 +126,9 @@ def generate_predictions():
         ).eq("event_id", eid).execute()
         all_bouts.extend(res.data)
 
-    upcoming_bout_ids = [b["bout_id"] for b in all_bouts]
-
-    # Retry fetching existing predictions with reconnect on failure
-    existing = set()
-    for attempt in range(3):
-        try:
-            existing = {r["bout_id"] for r in
-                        db.table("predictions").select("bout_id").in_(
-                            "bout_id", upcoming_bout_ids).execute().data}
-            break
-        except Exception as e:
-            log.warning(f"Predictions fetch attempt {attempt+1} failed: {e}")
-            time.sleep(2)
-            try:
-                new_db = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
-                existing = {r["bout_id"] for r in
-                            new_db.table("predictions").select("bout_id").in_(
-                                "bout_id", upcoming_bout_ids).execute().data}
-                break
-            except Exception as e2:
-                log.warning(f"Retry {attempt+1} also failed: {e2}")
+    # Skip bouts that already have predictions
+    existing = {r["bout_id"] for r in
+                db.table("predictions").select("bout_id").execute().data}
 
     generated = 0
     for bout in all_bouts:
