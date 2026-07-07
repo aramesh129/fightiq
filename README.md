@@ -1,3 +1,12 @@
+---
+title: FightIQ API
+emoji: 🥊
+colorFrom: red
+colorTo: gray
+sdk: docker
+pinned: false
+---
+
 # FightIQ 
 
 AI UFC fight prediction platform built with a calibrated ensemble model, real-time scraping, and automated weekly retraining.
