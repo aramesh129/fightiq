@@ -42,7 +42,7 @@ jobs:
           cd scripts
           python scraper.py
 
-        - name: Scrape fighter profiles
+      - name: Scrape fighter profiles
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
