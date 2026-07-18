@@ -16,6 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.api_route("/health", methods=["GET", "HEAD"])
+def health():
+    return {"status": "ok", "time": datetime.datetime.utcnow().isoformat()}
+
 def engineer_features(red: dict, blue: dict) -> list:
     def s(v): return float(v) if v is not None else 0.0
     def age(f):
