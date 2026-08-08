@@ -34,15 +34,26 @@ def get_model():
 
 ## fixed SHAP extraction
 
-dtry:
-    raw = explainer.shap_values(X)
-    sv = np.array(raw)
-    if sv.ndim == 3:
-        sv = sv[1][0]
-    elif sv.ndim == 2:
-        sv = sv[0]
-    sv = np.array(sv).flatten()[-len(feature_names):]
-    shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
-except Exception as e:
-    log.exception(f"SHAP computation failed for input shape {X.shape}: {e}")
-    shap_dict = {name: 0.0 for name in feature_names}
+def predict(features: list) -> dict:
+    model, explainer, feature_names = get_model()
+    X = np.array([features])
+    proba = model.predict_proba(X)[0]
+    red_prob  = float(proba[1])
+    blue_prob = float(proba[0])
+    try:                                    
+        raw = explainer.shap_values(X)
+        sv = np.array(raw)
+        if sv.ndim == 3:
+            sv = sv[1][0]
+        elif sv.ndim == 2:
+            sv = sv[0]
+        sv = np.array(sv).flatten()[-len(feature_names):]
+        shap_dict = {feature_names[i]: float(sv[i]) for i in range(len(feature_names))}
+    except Exception as e:
+        log.exception(f"SHAP computation failed for input shape {X.shape}: {e}")
+        shap_dict = {name: 0.0 for name in feature_names}
+    return {
+        "red_win_probability":  red_prob,
+        "blue_win_probability": blue_prob,
+        "shap_values":          shap_dict,
+    }
