@@ -40,15 +40,15 @@ def load_upcoming(driver):
         existing = db.table("events").select("event_id").eq(
             "event_name", ev["name"]).execute()
         if existing.data:
-            eid = existing.data[0]["event_id"]
-            log.info(f"RE-SYNC (exists): {ev['name']}")
-        else:
-            log.info(f"Loading: {ev['name']}")
-            eid = upsert_event(ev, False)
-            added += 1
+            log.info(f"SKIP (exists): {ev['name']}")
+            continue
+        log.info(f"Loading: {ev['name']}")
+        eid    = upsert_event(ev, False)
         driver = scrape_event(driver, ev["url"], eid)
-    log.info(f"Added {added} new upcoming events (re-synced any partial cards)")
+        added += 1
+    log.info(f"Added {added} new upcoming events")
     return driver
+
 
 def settle_recent(driver):
     log.info("Checking for recently completed events...")
@@ -58,6 +58,7 @@ def settle_recent(driver):
     if not pending:
         log.info("No pending events to settle")
         return driver
+
     soup = get_page(driver,
                     f"{BASE}/statistics/events/completed?page=all",
                     wait_class="b-statistics__table-row")
@@ -66,6 +67,7 @@ def settle_recent(driver):
         a = row.select_one("a.b-link")
         if a and a.get("href"):
             completed_map[a.get_text(strip=True).lower()] = a["href"]
+
     settled = 0
     for ev in pending:
         url = completed_map.get(ev["event_name"].lower())

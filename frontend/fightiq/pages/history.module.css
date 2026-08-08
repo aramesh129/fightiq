@@ -1,0 +1,312 @@
+.header {
+  padding: 32px 0 24px;
+  border-bottom: 1px solid #1a1a1a;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eventBlock {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Event row - the clickable header */
+.eventRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  background: none;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.eventRow:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.eventLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eventName {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: white;
+}
+
+.eventDate {
+  font-size: 12px;
+  color: #666;
+}
+
+.eventRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.boutCount {
+  font-size: 11px;
+  color: #555;
+}
+
+.accuracy {
+  font-size: 11px;
+  color: #888;
+  background: rgba(255,255,255,0.04);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #2a2a2a;
+}
+
+.chevron {
+  font-size: 16px;
+  color: #555;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Bout list */
+.boutList {
+  border-top: 1px solid #1e1e1e;
+}
+
+.boutRow {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0;
+  padding: 12px 20px;
+  border-bottom: 1px solid #1a1a1a;
+  cursor: pointer;
+  transition: background 0.12s;
+  text-decoration: none;
+  color: inherit;
+  align-items: center;
+}
+
+.boutRow:last-child {
+  border-bottom: none;
+}
+
+.boutRow:hover {
+  background: rgba(255,255,255,0.025);
+}
+
+/* Fighter columns */
+.boutFighter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.boutFighterRight {
+  justify-content: flex-end;
+}
+
+.boutAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.boutAvatarRed {
+  background: rgba(227,0,15,0.15);
+  color: #e3000f;
+  border: 1px solid rgba(227,0,15,0.2);
+}
+
+.boutAvatarBlue {
+  background: rgba(26,111,196,0.15);
+  color: #4da3ff;
+  border: 1px solid rgba(26,111,196,0.2);
+}
+
+.boutAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.boutFighterInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boutName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.winner {
+  color: white;
+}
+
+.winBadge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  background: rgba(0, 200, 80, 0.15);
+  color: #00c850;
+  border: 1px solid rgba(0,200,80,0.25);
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+.boutRecord {
+  font-size: 11px;
+  color: #555;
+}
+
+/* Center column */
+.boutCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.boutVs {
+  font-size: 10px;
+  color: #333;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.method {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666;
+  text-align: center;
+}
+
+.predBadge {
+  font-size: 11px;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.predCorrect {
+  background: rgba(0,200,80,0.15);
+  color: #00c850;
+}
+
+.predWrong {
+  background: rgba(227,0,15,0.15);
+  color: #e3000f;
+}
+
+.predPending {
+  background: rgba(255,255,255,0.05);
+  color: #555;
+}
+
+/* Prob bar row */
+.boutProbs {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.redProb {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e3000f;
+  min-width: 30px;
+}
+
+.blueProb {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4da3ff;
+  min-width: 30px;
+  text-align: right;
+}
+
+.boutBar {
+  flex: 1;
+  height: 3px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.boutBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e3000f var(--pct), #1a6fc4 var(--pct));
+}
+
+.loadMore {
+  margin: 16px auto;
+  display: block;
+  padding: 10px 32px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  background: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.loadMore:hover {
+  border-color: #555;
+  color: white;
+}
