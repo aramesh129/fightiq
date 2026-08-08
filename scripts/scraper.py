@@ -40,15 +40,15 @@ def load_upcoming(driver):
         existing = db.table("events").select("event_id").eq(
             "event_name", ev["name"]).execute()
         if existing.data:
-            log.info(f"SKIP (exists): {ev['name']}")
-            continue
-        log.info(f"Loading: {ev['name']}")
-        eid    = upsert_event(ev, False)
+            eid = existing.data[0]["event_id"]
+            log.info(f"RE-SYNC (exists): {ev['name']}")
+        else:
+            log.info(f"Loading: {ev['name']}")
+            eid = upsert_event(ev, False)
+            added += 1
         driver = scrape_event(driver, ev["url"], eid)
-        added += 1
-    log.info(f"Added {added} new upcoming events")
+    log.info(f"Added {added} new upcoming events (re-synced any partial cards)")
     return driver
-
 
 def settle_recent(driver):
     log.info("Checking for recently completed events...")
