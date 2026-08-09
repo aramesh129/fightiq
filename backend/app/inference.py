@@ -42,7 +42,10 @@ def predict(features: list) -> dict:
         raw = explainer.shap_values(X)
         sv = np.array(raw)
         if sv.ndim == 3:
-            sv = sv[1][0]
+            # shape is (n_classes, samples, features) — use class 1 if it
+            # exists, else fall back to the only class the explainer gave us
+            class_idx = min(1, sv.shape[0] - 1)
+            sv = sv[class_idx][0]
         elif sv.ndim == 2:
             sv = sv[0]
         sv = np.array(sv).flatten()[-len(feature_names):]
