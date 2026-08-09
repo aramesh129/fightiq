@@ -34,7 +34,7 @@ def get_model():
 
 ## fixed SHAP extraction
 
-dtry:
+try:
     raw = explainer.shap_values(X)
     sv = np.array(raw)
     if sv.ndim == 3:
