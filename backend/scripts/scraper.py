@@ -54,24 +54,48 @@ def settle_recent(driver):
     log.info("Checking for recently completed events...")
     prime_cache()
     pending = db.table("events").select(
-        "event_id,event_name").eq("is_completed", False).execute().data
+        "event_id,event_name,event_date").eq("is_completed", False).execute().data
     if not pending:
         log.info("No pending events to settle")
         return driver
     soup = get_page(driver,
                     f"{BASE}/statistics/events/completed?page=all",
                     wait_class="b-statistics__table-row")
-    completed_map = {}
+    completed_rows = []
     for row in soup.select("tr.b-statistics__table-row"):
         a = row.select_one("a.b-link")
+        d = row.select_one("span.b-statistics__date")
         if a and a.get("href"):
-            completed_map[a.get_text(strip=True).lower()] = a["href"]
+            completed_rows.append({
+                "name": a.get_text(strip=True),
+                "name_lower": a.get_text(strip=True).lower(),
+                "date": d.get_text(strip=True) if d else None,
+                "url": a["href"],
+            })
+    completed_map = {r["name_lower"]: r["url"] for r in completed_rows}
+
     settled = 0
     for ev in pending:
         url = completed_map.get(ev["event_name"].lower())
+        match_type = "exact name"
+
+        if not url and ev.get("event_date"):
+            # Fallback: match by date when the name lookup misses
+            # (renamed main event, extra whitespace, punctuation drift, etc.)
+            candidates = [r for r in completed_rows if r["date"] == ev["event_date"]]
+            if len(candidates) == 1:
+                url = candidates[0]["url"]
+                match_type = "date fallback"
+            elif len(candidates) > 1:
+                log.warning(
+                    f"Date fallback ambiguous for {ev['event_name']!r} "
+                    f"({ev['event_date']}): {len(candidates)} candidates, skipping"
+                )
+
         if not url:
             continue
-        log.info(f"Settling: {ev['event_name']}")
+
+        log.info(f"Settling ({match_type}): {ev['event_name']}")
         driver = scrape_event(driver, url, ev["event_id"])
         db.table("events").update({"is_completed": True}).eq(
             "event_id", ev["event_id"]).execute()
