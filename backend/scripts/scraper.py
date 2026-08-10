@@ -50,6 +50,7 @@ def load_upcoming(driver):
     log.info(f"Added {added} new upcoming events (re-synced any partial cards)")
     return driver
 
+
 def settle_recent(driver):
     log.info("Checking for recently completed events...")
     prime_cache()
@@ -80,8 +81,6 @@ def settle_recent(driver):
         match_type = "exact name"
 
         if not url and ev.get("event_date"):
-            # Fallback: match by date when the name lookup misses
-            # (renamed main event, extra whitespace, punctuation drift, etc.)
             candidates = [r for r in completed_rows if r["date"] == ev["event_date"]]
             if len(candidates) == 1:
                 url = candidates[0]["url"]
