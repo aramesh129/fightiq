@@ -1,7 +1,3 @@
-"""
-Debug why generate-predictions returns 0.
-Runs the same logic as the API endpoint but locally with full logging.
-"""
 import os, datetime, logging
 import numpy as np
 from supabase import create_client
@@ -12,7 +8,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger("debug")
 db = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
 
-# Step 1: what does upcoming_card return?
 log.info("Fetching upcoming_card...")
 upcoming = db.table("upcoming_card").select("*").execute().data
 log.info(f"upcoming_card rows: {len(upcoming)}")
@@ -26,7 +21,6 @@ else:
         log.info(f"    blue_fighter_id: {bout.get('blue_fighter_id')}")
         log.info(f"    bout_id: {bout.get('bout_id')}")
 
-        # Step 2: fetch fighter stats
         red = db.table("fighters").select("*").eq(
             "fighter_id", bout["red_fighter_id"]).single().execute().data
         blue = db.table("fighters").select("*").eq(
@@ -35,7 +29,6 @@ else:
         log.info(f"    red slpm={red.get('slpm')} sapm={red.get('sapm')} wins={red.get('wins')}")
         log.info(f"    blue slpm={blue.get('slpm')} sapm={blue.get('sapm')} wins={blue.get('wins')}")
 
-        # Step 3: try engineering features
         def s(v): return float(v) if v is not None else 0.0
         def wp(f):
             w = f.get("wins", 0) or 0
