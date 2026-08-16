@@ -66,11 +66,9 @@ def process_event(driver, event_url, event_id, name_cache):
         cols = row.select('td.b-fight-details__table-col')
         if len(cols) < 8: continue
 
-        # Col 0: check for b-flag_style_green = winner is first fighter listed
         col0 = cols[0]
         has_win_flag = bool(col0.select_one('a.b-flag_style_green'))
 
-        # Col 1: two fighter names first listed is always the winner on ufcstats
         fighter_links = cols[1].select('a.b-link')
         if len(fighter_links) < 2: continue
         name_first  = fighter_links[0].get_text(strip=True).lower()
@@ -82,8 +80,6 @@ def process_event(driver, event_url, event_id, name_cache):
             log.debug(f'  Fighters not found: {name_first} vs {name_second}')
             continue
 
-        # Winner = first listed fighter (ufcstats always puts winner first)
-        # Only set winner if green flag present (excludes draws/NCs)
         winner_id = id_first if has_win_flag else None
 
         win_method = cols[7].get_text(strip=True) if len(cols) > 7 else None
@@ -94,7 +90,6 @@ def process_event(driver, event_url, event_id, name_cache):
         if not win_method or win_method in ['', '---', 'Method']:
             win_method = None
 
-        # Find the bout try both red/blue assignments since scraper was arbitrary
         bout = None
         for r, b in [(id_first, id_second), (id_second, id_first)]:
             res = db.table('bouts').select('bout_id').eq('event_id', event_id).eq(
@@ -121,7 +116,6 @@ def main():
     log.info('Starting winner fix...')
     name_cache = build_name_cache()
 
-    # Get all event URLs in one scrape
     driver = make_driver()
     log.info('Browser started. Fetching event URLs...')
     soup, driver = get_page(driver, f'{BASE}/statistics/events/completed?page=all',
@@ -160,7 +154,6 @@ def main():
     result = db.table('bouts').select('bout_id', count='exact').not_.is_('winner_id','null').execute()
     log.info(f'Done! {result.count} bouts now have winners set.')
 
-    # Quick sanity check
     import subprocess
     log.info('Run this SQL to verify: SELECT COUNT(*) FILTER (WHERE winner_id = fighter_red_id) AS red_wins, COUNT(*) FILTER (WHERE winner_id = fighter_blue_id) AS blue_wins FROM bouts;')
 
