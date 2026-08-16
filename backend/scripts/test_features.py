@@ -3,7 +3,6 @@ sys.path.insert(0, '../backend')
 from dotenv import load_dotenv
 load_dotenv()
 
-# Test engineer_features with a sample fighter
 red = {
     'fighter_id': 'test',
     'first_name': 'Islam',
