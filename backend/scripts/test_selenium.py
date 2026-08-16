@@ -29,7 +29,6 @@ try:
     driver.get("http://www.ufcstats.com/statistics/events/completed?page=all")
     print("Page loaded, waiting for content...", flush=True)
 
-    # Wait up to 15 seconds for actual table rows to appear
     WebDriverWait(driver, 15).until(
         EC.presence_of_element_located((By.CLASS_NAME, "b-statistics__table-row"))
     )
@@ -38,7 +37,6 @@ try:
     print(f"Found {len(rows)} rows", flush=True)
     print("Page length:", len(driver.page_source), flush=True)
 
-    # Print first event name as a sanity check
     links = driver.find_elements(By.CSS_SELECTOR, "tr.b-statistics__table-row a.b-link")
     if links:
         print("First event:", links[0].text, flush=True)
