@@ -27,7 +27,6 @@ def get_model():
     global _loaded_at
     if _model is None:
         _load()
-    # Hot-reload every hour
     if (datetime.datetime.utcnow() - _loaded_at).seconds > 3600:
         _load()
     return _model, _explainer, _feature_names
