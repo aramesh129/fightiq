@@ -43,12 +43,10 @@ def predict(features: list) -> dict:
         sv = np.array(raw)
         if sv.ndim == 3:
             if sv.shape[0] == X.shape[0]:
-                # shape is (samples, features, classes) — newer SHAP convention
-                sample = sv[0]  # (features, classes)
+                sample = sv[0] 
                 class_idx = min(1, sample.shape[-1] - 1)
                 sv = sample[:, class_idx]
             else:
-                # shape is (classes, samples, features) — older SHAP convention
                 class_idx = min(1, sv.shape[0] - 1)
                 sv = sv[class_idx][0]
         elif sv.ndim == 2:
