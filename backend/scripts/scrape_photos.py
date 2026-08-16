@@ -62,7 +62,6 @@ def download_and_store(fighter_id, photo_url, slug):
         return None
 
 def get_all_missing():
-    """Paginate through all fighters missing photos."""
     all_missing = []
     page_size = 1000
     offset = 0
@@ -82,7 +81,6 @@ def main():
     all_missing = get_all_missing()
     log.info(f"Total fighters missing photos: {len(all_missing)}")
 
-    # Sort by most active fighters first (most wins + losses = most fights)
     all_missing.sort(
         key=lambda f: (f.get("wins") or 0) + (f.get("losses") or 0),
         reverse=True
