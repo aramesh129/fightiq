@@ -51,7 +51,6 @@ def engineer_features(red: dict, blue: dict) -> list:
         1.0 if blue.get("stance") == "Orthodox" else 0.0,
         1.0 if red.get("stance")  != blue.get("stance") else 0.0,
     ]
-    # Recent form placeholders (pipeline fills these; API uses career stats)
     recent = [0.0] * 8
     meta   = [0.0, 0.0,
               len([b for b in [] if True]) / max(1, (red.get("wins",0) or 0) + (red.get("losses",0) or 0)),
@@ -112,7 +111,6 @@ def model_stats():
 
 @app.post("/api/generate-predictions")
 def generate_predictions():
-    # Get all upcoming event IDs
     events = db.table("events").select("event_id").eq(
         "is_completed", False).execute().data
     event_ids = [e["event_id"] for e in events]
@@ -120,7 +118,6 @@ def generate_predictions():
     if not event_ids:
         return {"generated": 0, "reason": "no upcoming events"}
 
-    # Get all bouts for upcoming events
     all_bouts = []
     for eid in event_ids:
         res = db.table("bouts").select(
@@ -130,7 +127,6 @@ def generate_predictions():
         ).eq("event_id", eid).execute()
         all_bouts.extend(res.data)
 
-    # Skip bouts that already have predictions
     existing = {r["bout_id"] for r in
                 db.table("predictions").select("bout_id").execute().data}
 
