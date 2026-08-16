@@ -1,8 +1,4 @@
-"""
-Scrapes fighter profile stats (height, reach, stance, slpm, sapm etc.)
-from ufcstats.com for all fighters missing stats.
-Run once after backfill to populate career stats.
-"""
+
 import os, re, time, logging, datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -104,7 +100,6 @@ def get_fighter_url(driver, first_name, last_name):
     for a in soup.select("a.b-link_style_black"):
         if a.get_text(strip=True).lower() == full_name:
             return a.get("href"), driver
-    # fuzzy: try first name match
     for a in soup.select("a.b-link_style_black"):
         text = a.get_text(strip=True).lower()
         if first_name.lower() in text and last_name.lower() in text:
@@ -112,7 +107,6 @@ def get_fighter_url(driver, first_name, last_name):
     return None, driver
 
 def main():
-    # Get fighters missing stats — prioritize those in upcoming bouts
     upcoming_ids = set()
     upcoming_bouts = db.table("bouts").select(
         "fighter_red_id,fighter_blue_id"
@@ -126,12 +120,10 @@ def main():
 
     log.info(f"Upcoming bout fighters: {len(upcoming_ids)}")
 
-    # Get all fighters missing slpm (main stat indicator)
     missing = db.table("fighters").select(
         "fighter_id,first_name,last_name"
     ).is_("slpm", "null").execute().data
 
-    # Sort: upcoming fighters first
     missing.sort(key=lambda f: 0 if f["fighter_id"] in upcoming_ids else 1)
     log.info(f"Fighters missing stats: {len(missing)} (doing upcoming first)")
 
