@@ -1,13 +1,3 @@
-"""
-FightIQ Training Pipeline
-Key improvements over the basic version:
-  - Exponentially weighted rolling averages
-  - Performance trajectory features
-  - Red corner bias correction
-  - Expanded feature set (29 features)
-  - Cross-validation for more reliable evaluation
-"""
-
 import os, sys, json, datetime, logging, joblib
 import numpy as np
 from pathlib import Path
@@ -22,22 +12,15 @@ db = create_client(os.environ["SUPABASE_URL"],
                    os.environ["SUPABASE_SERVICE_KEY"])
 
 FEATURE_NAMES = [
-    # Career differentials
     "slpm_diff", "str_acc_diff", "sapm_diff", "str_def_diff",
     "td_avg_diff", "td_acc_diff", "td_def_diff", "sub_avg_diff",
-    # Physical
     "age_diff", "reach_diff", "height_diff",
-    # Record quality
     "red_win_pct", "blue_win_pct", "win_pct_diff",
-    # Stance
     "red_is_orthodox", "blue_is_orthodox", "stance_mismatch",
-    # NEW: Recency-weighted form (last 3 fights, exponentially weighted)
     "red_recent_slpm", "blue_recent_slpm", "recent_slpm_diff",
     "red_recent_sapm", "blue_recent_sapm", "recent_sapm_diff",
     "red_recent_td_def", "blue_recent_td_def",
-    # NEW: Trajectory (is fighter trending up or down?)
     "red_sapm_trend", "blue_sapm_trend",
-    # NEW: Experience and finish rate
     "red_finish_rate", "blue_finish_rate",
     "total_fights_diff",
 ]
@@ -47,7 +30,6 @@ FEATURE_NAMES = [
 
 def load_bouts() -> list:
     log.info("Stage 1: Loading bouts...")
-    # Load in pages of 1000 to get all bouts
     all_bouts = []
     page_size  = 1000
     offset     = 0
@@ -69,8 +51,6 @@ def load_bouts() -> list:
 
     log.info(f"  Total: {len(all_bouts)} completed bouts")
     return all_bouts
-
-# ── Per-fighter historical stats (for trajectory calculation) ─────────────────
 
 _fighter_history_cache: dict = {}
 
@@ -94,8 +74,6 @@ def get_fighter_history(fighter_id: str) -> list:
     _fighter_history_cache[fighter_id] = res.data
     return res.data
 
-
-# ── Feature helpers ───────────────────────────────────────────────────────────
 
 def _age(f) -> float:
     b = f.get("birthday")
@@ -137,10 +115,6 @@ def _exponential_weights(n: int, decay: float = 0.7) -> list:
 
 def _weighted_stat(bouts: list, fighter_id: str,
                    stat_key: str, total_mins: float = 15.0) -> float:
-    """
-    Computes an exponentially weighted average of a per-fight stat.
-    Weights recent bouts more heavily than older ones.
-    """
     values  = []
     for bout in bouts:
         stats_list = bout.get("fight_stats") or []
@@ -164,11 +138,6 @@ def _weighted_stat(bouts: list, fighter_id: str,
     return sum(v * w for v, w in zip(values, weights))
 
 def _sapm_trend(bouts: list, fighter_id: str) -> float:
-    """
-    Positive = fighter is absorbing MORE strikes recently (declining defense).
-    Negative = fighter is absorbing FEWER strikes recently (improving defense).
-    Computed as: recent_3_avg - older_avg, normalized.
-    """
     values = []
     for bout in bouts:
         stats_list = bout.get("fight_stats") or []
@@ -179,17 +148,15 @@ def _sapm_trend(bouts: list, fighter_id: str) -> float:
         values.append(a / 15.0)
 
     if len(values) < 4: return 0.0
-    recent = np.mean(values[:3])   # last 3 fights
-    older  = np.mean(values[3:])   # older fights
+    recent = np.mean(values[:3])   
+    older  = np.mean(values[3:])   
     return float(recent - older)
 
 
-# ── Core feature engineering ──────────────────────────────────────────────────
 
 def engineer(red: dict, blue: dict, bout_date: str = None) -> list:
     def s(v): return float(v) if v is not None else 0.0
 
-    # Career average differentials
     career = [
         s(red.get("slpm"))    - s(blue.get("slpm")),
         s(red.get("str_acc")) - s(blue.get("str_acc")),
@@ -208,7 +175,6 @@ def engineer(red: dict, blue: dict, bout_date: str = None) -> list:
         1.0 if red.get("stance")  != blue.get("stance") else 0.0,
     ]
 
-    # Recent form (exponentially weighted, last 8 fights)
     red_history  = get_fighter_history(red["fighter_id"])
     blue_history = get_fighter_history(blue["fighter_id"])
 
@@ -225,7 +191,6 @@ def engineer(red: dict, blue: dict, bout_date: str = None) -> list:
         red_r_tddef, blue_r_tddef,
     ]
 
-    # Trajectory and finish rate
     meta = [
         _sapm_trend(red_history,  red["fighter_id"]),
         _sapm_trend(blue_history, blue["fighter_id"]),
@@ -240,11 +205,6 @@ def engineer(red: dict, blue: dict, bout_date: str = None) -> list:
 # ── Stage 2: Build matrix ────────────────────────────────────────────────────
 
 def build_matrix(bouts):
-    """
-    Builds feature matrix from pre-loaded bout data.
-    Since winner_id always = fighter_red_id in our DB (due to ufcstats ordering),
-    we randomly flip 50% of bouts so the model sees both classes.
-    """
     global _fighter_history_cache
     _fighter_history_cache = {}
     import random
@@ -258,15 +218,11 @@ def build_matrix(bouts):
             red  = b["fighter_red"]
             blue = b["fighter_blue"]
 
-            # Randomly flip fighters so model sees both red-wins and blue-wins
-            # This is valid because the model learns from stat differentials,
-            # not from red/blue corner assignment
+            
             if random.random() < 0.5:
-                # Keep as-is: red = winner (label 1)
                 feats = engineer(red, blue)
                 label = 1
             else:
-                # Flip: blue perspective, so blue stats go first = loser (label 0)
                 feats = engineer(blue, red)
                 label = 0
 
@@ -283,7 +239,7 @@ def build_matrix(bouts):
     return np.array(X), np.array(y), dates
 
 
-# ── Stage 3: Update rolling stats (exponentially weighted) ───────────────────
+# ── Stage 3: Update rolling stats ───────────────────
 
 def update_rolling_stats():
     """
@@ -403,7 +359,6 @@ def train(X, y, dates):
     log.info("Stage 4: Training...")
     log.info(f"  Total samples: {len(X)}, Class distribution: {sum(y)}/{len(y)-sum(y)} (red wins/blue wins)")
 
-    # Always use random split — time split fails with small recent datasets
     Xtr, Xte, ytr, yte = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y)
     log.info(f"  Train={len(Xtr)}  Test={len(Xte)}")
@@ -450,14 +405,13 @@ def train(X, y, dates):
 
     return cal, m
 
-# ── Stage 5: SHAP explainer (correct path) ───────────────────────────────────
+# ── Stage 5: SHAP explainer ───────────────────────────────────
 
 def build_explainer(cal_model):
     import shap
     voting   = cal_model.calibrated_classifiers_[0].estimator
     rf_model = None
     for item in voting.estimators_:
-        # estimators_ can be (name, est) tuples or just estimators
         est = item[1] if isinstance(item, tuple) else item
         if hasattr(est, "n_estimators"):
             rf_model = est; break
