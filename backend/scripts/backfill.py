@@ -46,7 +46,6 @@ def make_driver():
                 chromedriver = os.path.join(driver_dir, f)
                 break
 
-    # Ensure executable permission
     os.chmod(chromedriver, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     service = Service(chromedriver)
@@ -83,7 +82,6 @@ def get_page_with_retry(driver, url: str, wait_class: str = None,
             time.sleep(3)
             log.info("Restarting Chrome...")
             driver = make_driver()
-    # Final attempt after restart
     soup = get_page(driver, url, wait_class=wait_class)
     return soup, driver
 
@@ -118,7 +116,6 @@ def get_or_create_fighter(name: str) -> str:
     first   = parts[0]
     last    = parts[1] if len(parts) > 1 else ""
 
-    # Try to find existing fighter first
     existing = db.table("fighters").select("fighter_id").eq(
         "first_name", first).eq("last_name", last).execute()
     if existing.data:
@@ -126,7 +123,6 @@ def get_or_create_fighter(name: str) -> str:
         _cache[key] = fid
         return fid
 
-    # Create new fighter
     payload = {
         "fighter_id": str(uuid.uuid4()),
         "first_name": first,
@@ -226,7 +222,6 @@ def scrape_event(driver, event_url: str, event_id: str) -> webdriver.Chrome:
         rnd = clean_int(cols[8].get_text()) if len(cols)>8 else None
         tme = cols[9].get_text(strip=True) if len(cols)>9 else None
 
-        # Delete dependent rows before upsert to avoid FK violations
         existing = db.table("bouts").select("bout_id").eq(
             "event_id", event_id).eq(
             "fighter_red_id", red_id).eq(
@@ -302,7 +297,6 @@ def main():
     log.info("Browser started.")
 
     try:
-        # Completed events
         log.info("Fetching completed events list...")
         completed, driver = get_all_events(driver, True)
         log.info(f"Found {len(completed)} completed events")
@@ -317,7 +311,6 @@ def main():
             eid    = upsert_event(ev, True)
             driver = scrape_event(driver, ev["url"], eid)
 
-        # Upcoming events
         log.info("Fetching upcoming events...")
         upcoming, driver = get_all_events(driver, False)
         for ev in upcoming:
