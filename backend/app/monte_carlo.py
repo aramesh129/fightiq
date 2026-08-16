@@ -4,7 +4,6 @@ from .database import db
 def simulate(bout_id: str, red_id: str, blue_id: str,
              red_prob: float, n: int = 10000) -> dict:
     red_wins = np.random.random(n) < red_prob
-    # Get finish rates from fight history
     def finish_rate(fighter_id: str) -> tuple:
         bouts = db.table("bouts").select("winner_id,win_method").or_(
             f"fighter_red_id.eq.{fighter_id},fighter_blue_id.eq.{fighter_id}"
