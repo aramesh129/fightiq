@@ -3,7 +3,6 @@ import { initials } from '../lib/api'
 import styles from './FightCard.module.css'
 
 export default function FightCard({ bout, isMain, isCoMain }) {
-  // Upcoming API is flat
   const redName = bout.red_fighter || ''
   const blueName = bout.blue_fighter || ''
   const redPhoto = bout.red_photo_url
@@ -18,7 +17,6 @@ export default function FightCard({ bout, isMain, isCoMain }) {
   return (
     <div className={styles.card}>
       <div className={styles.fighters}>
-        {/* Red corner */}
         <div className={styles.corner}>
           <div className={styles.photo}>
             {redPhoto
@@ -34,7 +32,6 @@ export default function FightCard({ bout, isMain, isCoMain }) {
           </div>
         </div>
 
-        {/* Center */}
         <div className={styles.center}>
           <div className={styles.vs}>VS</div>
           {bout.weight_class && <div className={styles.weightClass}>{bout.weight_class}</div>}
@@ -46,7 +43,6 @@ export default function FightCard({ bout, isMain, isCoMain }) {
           )}
         </div>
 
-        {/* Blue corner */}
         <div className={`${styles.corner} ${styles.cornerBlue}`}>
           <div className={`${styles.info} ${styles.infoRight}`}>
             <div className={`${styles.cornerLabel} ${styles.blueLabel}`}>Blue Corner</div>
@@ -63,7 +59,6 @@ export default function FightCard({ bout, isMain, isCoMain }) {
         </div>
       </div>
 
-      {/* Footer */}
       <div className={styles.footer}>
         <div className={styles.footerLeft}>
           {isMain && <span className={styles.badge}>Main Event</span>}
