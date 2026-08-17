@@ -34,7 +34,6 @@ export default function Stats() {
           <div className={styles.empty}>No model versions found</div>
         ) : (
           <>
-            {/* Hero metrics */}
             <div className={styles.metricsGrid}>
               <div className={styles.metricCard}>
                 <div className={styles.metricVal} style={{ color: '#e3000f' }}>
@@ -113,7 +112,6 @@ export default function Stats() {
               </div>
             </div>
 
-            {/* Feature groups */}
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Feature Groups</h2>
               <div className={styles.featureGroups}>
@@ -153,7 +151,6 @@ export default function Stats() {
               </div>
             </div>
 
-            {/* Version history */}
             {versions.length > 1 && (
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>Version History</h2>
