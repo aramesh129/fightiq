@@ -22,7 +22,6 @@ export default function Home() {
 
   const events = groupByEvent(data)
   const currentEvent = events.find(e => e.event_id === selectedEvent)
-  // Reverse so main event is first (highest bout_order)
   const bouts = [...(currentEvent?.bouts || [])].sort((a, b) => b.bout_order - a.bout_order)
 
   function daysUntil(dateStr) {
