@@ -82,7 +82,6 @@ export default function History() {
 
                         return (
                           <Link key={bout.bout_id} href={`/fight/${bout.bout_id}`} className={styles.boutRow}>
-                            {/* Red fighter */}
                             <div className={styles.boutFighter}>
                               <div className={`${styles.boutAvatar} ${styles.boutAvatarRed}`}>
                                 {red.photo_url
@@ -97,7 +96,6 @@ export default function History() {
                               </div>
                             </div>
 
-                            {/* Center */}
                             <div className={styles.boutCenter}>
                               {bout.win_method && <span className={styles.method}>{bout.win_method}</span>}
                               <span className={styles.boutVs}>vs</span>
@@ -108,7 +106,6 @@ export default function History() {
                               )}
                             </div>
 
-                            {/* Blue fighter */}
                             <div className={`${styles.boutFighter} ${styles.boutFighterRight}`}>
                               <div className={styles.boutFighterInfo} style={{ textAlign: 'right' }}>
                                 <span className={`${styles.boutName} ${blueWon ? styles.winner : ''}`}>
@@ -123,7 +120,6 @@ export default function History() {
                               </div>
                             </div>
 
-                            {/* Prob bar */}
                             {pred && (
                               <div className={styles.boutProbs}>
                                 <span className={styles.redProb}>{Math.round(pred.red_win_probability * 100)}%</span>
